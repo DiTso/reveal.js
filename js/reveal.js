@@ -1562,15 +1562,32 @@
 			var size = getComputedSlideSize();
 
 			var slidePadding = 20; // TODO Dig this out of DOM
+			
+			var state = Reveal.getState(),
+				slideHeight;
+			if( state.indexh !== undefined && state.indexv !== undefined ){
+				var horizontalSlides = dom.wrapper.querySelectorAll( HORIZONTAL_SLIDES_SELECTOR ),
+					currentHorizontalSlide = horizontalSlides[ state.indexh ],
+					currentVerticalSlides = currentHorizontalSlide.querySelectorAll( 'section' );
+				var currentSlide = currentVerticalSlides[ indexv ] || currentHorizontalSlide;
+				slideHeight = currentSlide.getAttribute( 'data-height' );
+			}
 
 			// Layout the contents of the slides
 			layoutSlideContents( config.width, config.height, slidePadding );
 
 			dom.slides.style.width = size.width + 'px';
-			dom.slides.style.height = size.height + 'px';
-
-			// Determine scale of content to fit within available space
-			scale = Math.min( size.presentationWidth / size.width, size.presentationHeight / size.height );
+			console.log(slideHeight);
+			if ( slideHeight ) {
+				dom.slides.style.height = slideHeight + 'px';
+				dom.wrapper.style.height = slideHeight + 'px';
+				scale = 1;
+			} else {
+				dom.slides.style.height = size.height + 'px';
+				dom.wrapper.style.height = '';
+				// Determine scale of content to fit within available space
+				scale = Math.min( size.presentationWidth / size.width, size.presentationHeight / size.height );
+			}
 
 			// Respect max/min scale settings
 			scale = Math.max( scale, config.minScale );
